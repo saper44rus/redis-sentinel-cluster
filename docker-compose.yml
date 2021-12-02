@@ -84,7 +84,7 @@ services:
       - sentinel01
 
   haproxy:
-    image: haproxy
+    image: redis:haproxy
     container_name: haproxy
     hostname: haproxy
     ports:

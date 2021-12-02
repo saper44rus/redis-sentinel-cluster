@@ -12,3 +12,8 @@ FROM base AS sentinel
 RUN apt install redis-sentinel -y && apt clean
 EXPOSE 26379
 CMD ["redis-sentinel", "/etc/redis/sentinel.conf"]
+
+FROM base AS haproxy
+RUN apt install haproxy -y && apt clean
+EXPOSE 26379
+CMD ["/usr/sbin/haproxy", "-f", "/usr/local/etc/haproxy/haproxy.cfg"]

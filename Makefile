@@ -2,6 +2,7 @@
 config:
 	docker build --target redis --tag redis:cluster .
 	docker build --target sentinel --tag redis:sentinel .
+	docker build --target haproxy --tag redis:haproxy .
 	docker network create redis-network --subnet 172.23.0.0/24 || true
 	rm -rf redis01 redis02 redis03 
 	mkdir -p redis01 redis02 redis03
