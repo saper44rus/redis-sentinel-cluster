@@ -1,0 +1,105 @@
+---
+version: '3.5'
+services:
+  redis01:
+    image: redis:cluster
+    restart: always
+    container_name: redis01
+    hostname: redis01
+    ports:
+      - 127.0.0.1:6379:6379
+    networks:
+      redis-network:
+        ipv4_address: 172.23.0.11
+    volumes:
+      - ./data/redis01:/data
+      - ${PWD}/redis01:/etc/redis
+
+  redis02:
+    image: redis:cluster
+    container_name: redis02
+    hostname: redis02
+    networks:
+      redis-network:
+        ipv4_address: 172.23.0.12
+    volumes:
+      - ./data/redis02:/data
+      - ${PWD}/redis02:/etc/redis
+    depends_on:
+      - redis01
+
+  redis03:
+    image: redis:cluster
+    container_name: redis03
+    hostname: redis03
+    networks:
+      redis-network:
+        ipv4_address: 172.23.0.13
+    volumes:
+      - ./data/redis03:/data
+      - ${PWD}/redis03:/etc/redis
+    depends_on:
+      - redis02
+
+  sentinel01:
+    image: redis:sentinel
+    container_name: sentinel01
+    hostname: sentinel01
+    networks:
+      redis-network:
+        ipv4_address: 172.23.0.14
+    volumes:
+      - ./data/redis01:/data
+      - ${PWD}/redis01:/etc/redis
+    depends_on:
+      - redis02
+      - redis03
+
+  sentinel02:
+    image: redis:sentinel
+    container_name: sentinel02
+    hostname: sentinel02
+    networks:
+      redis-network:
+        ipv4_address: 172.23.0.15
+    volumes:
+      - ./data/redis02:/data
+      - ${PWD}/redis02:/etc/redis
+    depends_on:
+      - redis02
+      - redis03
+      - sentinel01
+
+  sentinel03:
+    image: redis:sentinel
+    container_name: sentinel03
+    hostname: sentinel03
+    networks:
+      redis-network:
+        ipv4_address: 172.23.0.16
+    volumes:
+      - ./data/redis03:/data
+      - ${PWD}/redis03:/etc/redis
+    depends_on:
+      - redis02
+      - redis03
+      - sentinel01
+
+  haproxy:
+    image: haproxy
+    container_name: haproxy
+    hostname: haproxy
+    networks:
+      redis-network:
+        ipv4_address: 172.23.0.17
+    volumes:
+      - ./haproxy.conf:/etc/haproxy/haproxy.conf
+
+
+networks:
+  redis-network:
+    name: redis-network
+    external: true
+    ipam:
+      config:
+        - subnet: 172.23.0.0/24
