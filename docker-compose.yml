@@ -6,13 +6,11 @@ services:
     restart: always
     container_name: redis01
     hostname: redis01
-    ports:
-      - 127.0.0.1:6379:6379
     networks:
       redis-network:
         ipv4_address: 172.23.0.11
     volumes:
-      - ./data/redis01:/data
+      - ./data/redis01:/var/lib/redis
       - ${PWD}/redis01:/etc/redis
 
   redis02:
@@ -23,7 +21,7 @@ services:
       redis-network:
         ipv4_address: 172.23.0.12
     volumes:
-      - ./data/redis02:/data
+      - ./data/redis02:/var/lib/redis
       - ${PWD}/redis02:/etc/redis
     depends_on:
       - redis01
@@ -36,7 +34,7 @@ services:
       redis-network:
         ipv4_address: 172.23.0.13
     volumes:
-      - ./data/redis03:/data
+      - ./data/redis03:/var/lib/redis
       - ${PWD}/redis03:/etc/redis
     depends_on:
       - redis02
@@ -49,7 +47,7 @@ services:
       redis-network:
         ipv4_address: 172.23.0.14
     volumes:
-      - ./data/redis01:/data
+      - ./data/redis01:/var/lib/redis
       - ${PWD}/redis01:/etc/redis
     depends_on:
       - redis02
@@ -63,7 +61,7 @@ services:
       redis-network:
         ipv4_address: 172.23.0.15
     volumes:
-      - ./data/redis02:/data
+      - ./data/redis02:/var/lib/redis
       - ${PWD}/redis02:/etc/redis
     depends_on:
       - redis02
@@ -78,7 +76,7 @@ services:
       redis-network:
         ipv4_address: 172.23.0.16
     volumes:
-      - ./data/redis03:/data
+      - ./data/redis03:/var/lib/redis
       - ${PWD}/redis03:/etc/redis
     depends_on:
       - redis02
@@ -89,12 +87,16 @@ services:
     image: haproxy
     container_name: haproxy
     hostname: haproxy
+    ports:
+      - 6379:6379
+      - 8080:8080
     networks:
       redis-network:
         ipv4_address: 172.23.0.17
     volumes:
-      - ./haproxy.conf:/etc/haproxy/haproxy.conf
-
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    depends_on:
+      - sentinel03
 
 networks:
   redis-network:
