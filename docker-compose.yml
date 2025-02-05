@@ -98,6 +98,20 @@ services:
     depends_on:
       - sentinel03
 
+  redisinsight:
+    image: redislabs/redisinsight:1.7.0
+    container_name: redisinsight
+    hostname: redisinsight
+    ports:
+      - 80:8001
+    networks:
+      redis-network:
+        ipv4_address: 172.23.0.18
+    volumes:
+      - ./redisinsight:/db
+    depends_on:
+      - haproxy
+
 networks:
   redis-network:
     name: redis-network
